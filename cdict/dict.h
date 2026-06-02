@@ -8,7 +8,7 @@ struct dict_entry {
 };
 
 struct dict {
-    dict_entry* entries;
+    struct dict_entry* entries;
     int size;
     int reserved_size;
 };
@@ -22,4 +22,6 @@ struct dict_entry* dict_find(struct dict* dict, const char* key);
 
 struct dict_entry* dict_put(struct dict* dict, const char* key, int value);
 
-#endif // DICT_H
+void dict_iterate(struct dict* dict, void (*visit)(struct dict_entry* entry));
+
+#endif /* DICT_H */
