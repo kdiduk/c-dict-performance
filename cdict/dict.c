@@ -28,7 +28,7 @@ void dict_destroy(struct dict* dict)
     }
 
     for (int i = 0; i < dict->size; i++) {
-        free(dict->entries[i].key);
+        free((void*)dict->entries[i].key);
     }
     free(dict->entries);
     free(dict);
