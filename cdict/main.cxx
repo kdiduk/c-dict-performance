@@ -2,33 +2,30 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <chrono>
 #include <iostream>
 #include <random>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
-
 
 extern "C" {
     #include "dict.h"
 }
 
-#define LINE_BUFFER_SIZE (256)
-
-char line_buffer[LINE_BUFFER_SIZE + 1];
-
-
-void print_dict_entry(struct dict_entry* entry);
-
 
 constexpr int RNG_SEED = 12345;
 
 
-class benchmark {
+class benchmark final {
 private:
     const size_t dict_size;
     const size_t key_len;
     const size_t query_count;
+
+    struct ::dict* cdict = nullptr;
+    std::unordered_map<std::string, int> hashmap;
     
     // all keys in a string form, all with the same length
     const std::vector<std::string> keys; 
@@ -88,51 +85,99 @@ public:
             keys(generate_keys(dict_size, key_len)),
             queries(generate_queries(query_count, dict_size))
     {
+        cdict = dict_create((int)dict_size + 1);
+        for (int i = 0; i < dict_size; ++i) {
+            dict_put(cdict, keys[i].c_str(), i);
+            hashmap[keys[i]] = i;
+        }
     }
 
-    std::uint32_t benchmark_dict(size_t runs_count)
+    ~benchmark()
     {
-        return 0;
+        if (cdict) {
+            dict_destroy(cdict);
+            cdict = nullptr;
+        }
+    }
+    
+    long long benchmark_dict(size_t runs_count) const
+    {
+        using timer = std::chrono::steady_clock;
+
+        volatile long long sink = 0;
+        timer::time_point begin = timer::now();
+        for (size_t i = 0; i < runs_count; ++i) {
+            const char* key = keys[queries[i]].c_str();
+            struct dict_entry* entry = dict_find(cdict, key);
+            sink += entry->value;
+        }
+        timer::time_point end = timer::now();
+        
+        return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
     }
 
-    std::uint32_t benchmark_unordered_map(size_t runs_count)
+    long long benchmark_unordered_map(size_t runs_count) const
     {
-        return 0;
+        using timer = std::chrono::steady_clock;
+
+        volatile long long sink = 0;
+
+        timer::time_point begin = timer::now();
+        for (size_t i = 0; i < runs_count; ++i) {
+            const std::string& key = keys[queries[i]].c_str();
+            auto it = hashmap.find(key);
+            sink += it->second;
+        }
+        timer::time_point end = timer::now();
+        
+        return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
     }
 };
 
 
 int main(int argc, char** argv)
 {
-    if (argc < 2) {
-        std::cerr << "Missing program argument: number of unique keys in a dictionary" 
+    std::cout << "Benchmarking of naive dictionary implementation in C"
+        #ifdef NDEBUG
+            << " [Release build]\n"
+        #else
+            << " [Debug build]\n"
+        #endif
+        << "Compare brute force array-based dictionary vs std::unordered_map\n\n"
+        << "Parameters: \n"
+        << "N = size of the dictionary (number of items in the dictionary)\n"
+        << "L = lengt of the keys (we use keys of the equal length)\n"
+        << "Q = number of find queries to the dictionary (we search only existing keys)\n"
+        << std::endl;
+
+    const std::initializer_list<size_t> dict_sizes = { 10, 20, 50, 100, 200, 500, 1000 };
+    const size_t key_len = 5;
+    const size_t query_count = 100000;
+
+    for (size_t dict_size: dict_sizes) {
+        std::cout << "=====================================================\n";
+        std::cout << "Benchmark with N = " << dict_size
+            << ", L = " << key_len
+            << ", Q = " << query_count
             << std::endl;
-        std::exit(EXIT_FAILURE);
+        benchmark bm(dict_size, key_len, query_count);
+
+        // warm up
+        bm.benchmark_dict(query_count);
+
+        auto time_cdict = bm.benchmark_dict(query_count);
+        std::cout << "C naive dictionary time: " << time_cdict << " us" << std::endl;
+
+        // warm up
+        bm.benchmark_unordered_map(query_count);
+
+        auto time_hsmap = bm.benchmark_unordered_map(query_count);
+        std::cout << "C++ unordererd map time: " << time_hsmap << " us" << std::endl;
+        std::cout << "=====================================================\n";
     }
-
-    const int unique_keys_count = std::stoi(argv[1]);
-    std::cout << "Running test with " << unique_keys_count << "keys" << std::endl;
-
-    struct dict* dict = dict_create(unique_keys_count);
-    
-    // Fill in the dict with keys
-    for (int i = 0; i < unique_keys_count; i++) {
-        char key[10];
-        snprintf(key, sizeof(key), "%08u", i);
-        dict_put(dict, key, i);
-    }
-
-    dict_iterate(dict, print_dict_entry);
-
-    dict_destroy(dict);
 
     return EXIT_SUCCESS;
 }
 
-
-void print_dict_entry(struct dict_entry* entry)
-{
-    fprintf(stdout, "%s: %d\n", entry->key, entry->value);
-}
 
 /* EOF */
