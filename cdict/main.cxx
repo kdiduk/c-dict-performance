@@ -124,7 +124,7 @@ public:
 
         timer::time_point begin = timer::now();
         for (size_t i = 0; i < runs_count; ++i) {
-            const std::string& key = keys[queries[i]].c_str();
+            const std::string& key = keys[queries[i]];
             auto it = hashmap.find(key);
             sink += it->second;
         }
