@@ -44,7 +44,7 @@ private:
             throw std::runtime_error("Wrong input data: dict size must be greater than 0");
         }
         
-        if (std::to_string(dict_size-1).length() > key_len) {
+        if (std::to_string(dict_size-1).length() > key_len/3) {
             throw std::runtime_error("Wrong input data: key length too short");
         }
 
@@ -53,8 +53,12 @@ private:
         for (size_t i = 0; i < dict_size; ++i) {
             std::string key = std::to_string(i);
 
-            if (key.length() < key_len) {
-                key.insert(0, key_len - key.length(), '0');
+            if (key.length() < key_len/3) {
+                key.insert(0, (key_len/3) - key.length(), '0');
+            }
+            key = key + key + key;
+            if (key.length() != key_len) {
+                throw std::runtime_error("Wrong key length");
             }
             
             keys.push_back(std::move(key));
@@ -180,14 +184,14 @@ int main()
         << "N = size of the dictionary (number of items in the dictionary)\n"
         << "L = lengt of the keys (we use keys of the equal length)\n"
         << "Q = number of find queries to the dictionary (we search only existing keys)\n"
-        << "R = number of repeated runs (we use the best of them)\n"
+        << "R = number of repeated runs (we use the median of them)\n"
         << "=====================================================\n"
         << std::endl;
 
     const std::initializer_list<size_t> dict_sizes = { 10, 20, 50, 100, 200, 500, 1000 };
-    const size_t key_len = 5;
+    const size_t key_len = 15;
     const size_t query_count = 100000;
-    const size_t repeat_count = 10;
+    const size_t repeat_count = 21;
 
     for (size_t dict_size: dict_sizes) {
         //std::cout << "=====================================================\n";
@@ -198,39 +202,47 @@ int main()
             << std::endl;
         benchmark bm(dict_size, key_len, query_count);
 
-        auto time_cdict = bm.benchmark_dict(query_count);
-        for (size_t i = 1; i < repeat_count; ++i) {
-            time_cdict = std::min(time_cdict, bm.benchmark_dict(query_count));
+        std::vector<long long> series;
+        series.reserve(repeat_count);
+
+        for (size_t i = 0; i < repeat_count; ++i) {
+            series.push_back(bm.benchmark_dict(query_count));
         }
+        std::sort(series.begin(), series.end());
+        auto time_cdict = series[repeat_count / 2];
         std::cout << "C naive dictionary time: " 
             << time_cdict << " us" 
             << std::endl;
+        series.clear();
 
-        auto time_rbtree = bm.benchmark_map(query_count);
-        for (size_t i = 1; i < repeat_count; i++) {
-            time_rbtree = std::min(time_rbtree, bm.benchmark_map(query_count));
+        
+        for (size_t i = 0; i < repeat_count; i++) {
+            series.push_back(bm.benchmark_map(query_count));
         }
-        double rbtree_speedup = static_cast<double>(time_cdict)/time_rbtree;
+        std::sort(series.begin(), series.end());
+        auto time_rbtree = series[repeat_count / 2];
         std::cout << "C++ std::map time:       " 
-            << time_rbtree << " us "
-            << "(speedup: "
+            << time_rbtree << " us"
+            << " (speed ratio: "
             << std::fixed
             << std::setprecision(2)
-            << rbtree_speedup 
+            << static_cast<double>(time_cdict)/time_rbtree 
             << "x)" 
             << std::endl;
 
-        auto time_hsmap = bm.benchmark_unordered_map(query_count);
-        for (size_t i = 1; i < repeat_count; i++) {
-            time_hsmap = std::min(time_hsmap, bm.benchmark_unordered_map(query_count));
+        
+        series.clear();
+        for (size_t i = 0; i < repeat_count; i++) {
+            series.push_back(bm.benchmark_unordered_map(query_count));
         }
-        double hash_speedup = static_cast<double>(time_cdict)/time_hsmap;
+        std::sort(series.begin(), series.end());
+        auto time_hsmap = series[repeat_count / 2];
         std::cout << "C++ unordererd map time: " 
             << time_hsmap << " us" 
-            << "(speedup: "
+            << " (speed ratio: "
             << std::fixed
             << std::setprecision(2)
-            << hash_speedup 
+            << static_cast<double>(time_cdict)/time_hsmap 
             << "x)" 
             << std::endl;
 
