@@ -46,7 +46,7 @@ private:
             throw std::runtime_error("Wrong input data: dict size must be greater than 0");
         }
         
-        if (std::to_string(dict_size-1).length() > key_len/3) {
+        if (std::to_string(dict_size-1).length() > key_len) {
             throw std::runtime_error("Wrong input data: key length too short");
         }
 
@@ -55,12 +55,8 @@ private:
         for (size_t i = 0; i < dict_size; ++i) {
             std::string key = std::to_string(i);
 
-            if (key.length() < key_len/3) {
-                key.insert(0, (key_len/3) - key.length(), '0');
-            }
-            key = key + key + key;
-            if (key.length() != key_len) {
-                throw std::runtime_error("Wrong key length");
+            if (key.length() < key_len) {
+                key.insert(0, key_len - key.length(), '0');
             }
             
             keys.push_back(std::move(key));
@@ -212,8 +208,9 @@ int main()
         << "=====================================================\n"
         << std::endl;
 
-    const std::initializer_list<size_t> dict_sizes = { 10, 20, 50, 100, 200, 500, 1000 };
-    const size_t key_len = 15;
+    const std::initializer_list<size_t> dict_sizes = 
+        { 10, 20, 50, 100, 200, 500, 1000, 10000 };
+    const size_t key_len = 8;
     const size_t query_count = 100000;
     const size_t repeat_count = 21;
 
@@ -248,7 +245,6 @@ int main()
         std::sort(series.begin(), series.end());
         auto time_qdict = series[repeat_count / 2];
         std::cout << "C sorted dictionary time: "
-            << time_qdict << " us" 
             << time_qdict << " us"
             << " (speed ratio vs above: "
             << std::fixed
@@ -259,6 +255,7 @@ int main()
         series.clear();
 
         
+        // Benchmark std::map
         for (size_t i = 0; i < repeat_count; i++) {
             series.push_back(bm.benchmark_map(query_count));
         }
@@ -274,6 +271,7 @@ int main()
             << std::endl;
 
         
+        // Benchmark std::unordered_map
         series.clear();
         for (size_t i = 0; i < repeat_count; i++) {
             series.push_back(bm.benchmark_unordered_map(query_count));
