@@ -14,6 +14,7 @@
 
 extern "C" {
     #include "dict.h"
+    #include "qdict.h"
 }
 
 
@@ -27,6 +28,7 @@ private:
     const size_t query_count;
 
     struct ::dict* cdict = nullptr;
+    struct ::qdict* qdict = nullptr;
     std::map<std::string, int> rbtree;
     std::unordered_map<std::string, int> hashmap;
     
@@ -93,11 +95,14 @@ public:
             queries(generate_queries(query_count, dict_size))
     {
         cdict = dict_create((int)dict_size + 1);
+        qdict = qdict_create((int)dict_size + 1);
         for (int i = 0; i < dict_size; ++i) {
             dict_put(cdict, keys[i].c_str(), i);
+            qdict_put(qdict, keys[i].c_str(), i);
             hashmap[keys[i]] = i;
             rbtree[keys[i]] = i;
         }
+        qdict_sort(qdict);
 
         if (hashmap.size() != dict_size) {
             throw std::runtime_error("std::unordered map not initialized correctly");
@@ -112,6 +117,8 @@ public:
     {
         if (cdict) {
             dict_destroy(cdict);
+            qdict_destroy(qdict);
+            qdict = nullptr;
             cdict = nullptr;
         }
     }
@@ -125,6 +132,22 @@ public:
         for (size_t i = 0; i < runs_count; ++i) {
             const char* key = keys[queries[i]].c_str();
             struct dict_entry* entry = dict_find(cdict, key);
+            sink += entry->value;
+        }
+        timer::time_point end = timer::now();
+        
+        return std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    }
+
+    long long benchmark_qdict(size_t runs_count) const
+    {
+        using timer = std::chrono::steady_clock;
+
+        volatile long long sink = 0;
+        timer::time_point begin = timer::now();
+        for (size_t i = 0; i < runs_count; ++i) {
+            const char* key = keys[queries[i]].c_str();
+            struct qdict_entry* entry = qdict_find(qdict, key);
             sink += entry->value;
         }
         timer::time_point end = timer::now();
@@ -177,7 +200,8 @@ int main()
             << " [Debug build]\n"
         #endif
         << "Compare performance of the following variants:\n"
-        << " - simple but naive array-based dictionary in plain C with full search\n"
+        << " - naive array-based dictionary in plain C with full search\n"
+        << " - sorted array-based dictionary in plain C with binary search\n"
         << " - std::map from C++\n"
         << " - std::unordered_map from C++\n\n"
         << "Parameters: \n"
@@ -205,13 +229,32 @@ int main()
         std::vector<long long> series;
         series.reserve(repeat_count);
 
+        // Benchmark C naive dictionary
         for (size_t i = 0; i < repeat_count; ++i) {
             series.push_back(bm.benchmark_dict(query_count));
         }
         std::sort(series.begin(), series.end());
         auto time_cdict = series[repeat_count / 2];
-        std::cout << "C naive dictionary time: " 
+        std::cout << "C naive dictionary time:  " 
             << time_cdict << " us" 
+            << std::endl;
+        series.clear();
+
+
+        // Benchmark C sorted dictionary with binary search
+        for (size_t i = 0; i < repeat_count; ++i) {
+            series.push_back(bm.benchmark_qdict(query_count));
+        }
+        std::sort(series.begin(), series.end());
+        auto time_qdict = series[repeat_count / 2];
+        std::cout << "C sorted dictionary time: "
+            << time_qdict << " us" 
+            << time_qdict << " us"
+            << " (speed ratio vs above: "
+            << std::fixed
+            << std::setprecision(2)
+            << static_cast<double>(time_cdict)/time_qdict 
+            << "x)" 
             << std::endl;
         series.clear();
 
@@ -221,12 +264,12 @@ int main()
         }
         std::sort(series.begin(), series.end());
         auto time_rbtree = series[repeat_count / 2];
-        std::cout << "C++ std::map time:       " 
+        std::cout << "C++ std::map time:        " 
             << time_rbtree << " us"
-            << " (speed ratio: "
+            << " (speed ratio vs above: "
             << std::fixed
             << std::setprecision(2)
-            << static_cast<double>(time_cdict)/time_rbtree 
+            << static_cast<double>(time_qdict)/time_rbtree 
             << "x)" 
             << std::endl;
 
@@ -237,12 +280,12 @@ int main()
         }
         std::sort(series.begin(), series.end());
         auto time_hsmap = series[repeat_count / 2];
-        std::cout << "C++ unordererd map time: " 
+        std::cout << "C++ unordererd map time:  " 
             << time_hsmap << " us" 
-            << " (speed ratio: "
+            << " (speed ratio vs above: "
             << std::fixed
             << std::setprecision(2)
-            << static_cast<double>(time_cdict)/time_hsmap 
+            << static_cast<double>(time_rbtree)/time_hsmap 
             << "x)" 
             << std::endl;
 
