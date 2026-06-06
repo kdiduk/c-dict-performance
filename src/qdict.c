@@ -52,7 +52,7 @@ void qdict_destroy(struct qdict* dict)
 }
 
 
-struct qdict_entry* qdict_find(const struct qdict* dict, const char* key)
+struct qdict_entry* qdict_find(struct qdict* dict, const char* key)
 {
     if (!dict) {
         return NULL;
@@ -62,7 +62,6 @@ struct qdict_entry* qdict_find(const struct qdict* dict, const char* key)
         qdict_sort(dict);
     }
 
-    /* TODO: do binary search */
     struct qdict_entry key_entry = { .key = key };
 
     return bsearch(
