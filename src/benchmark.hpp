@@ -36,14 +36,10 @@ private:
     std::unordered_map<std::string, int> hashmap;
     
     // all keys in a string form, all with the same length
-    const std::vector<std::string> keys; 
+    const std::vector<std::string> keys;
 
     // random indices of keys to be queried during a benchmark
     std::vector<std::size_t> queries;
-
-    // generate unique random keys of equal length key_len: 
-    // generate numbers with leading zeroes from 0 to data_count-1
-    static std::vector<std::string> generate_keys(size_t dict_size, size_t key_len = 8);
 
     // Pre-generate random indices of the keys
     static std::vector<size_t> generate_queries(size_t query_count, size_t dict_size);

@@ -1,30 +1,5 @@
 #include "benchmark.hpp"
-
-
-std::vector<std::string> benchmark::generate_keys(size_t dict_size, size_t key_len)
-{
-    if (dict_size == 0) {
-        throw std::runtime_error("Wrong input data: dict size must be greater than 0");
-    }
-    
-    if (std::to_string(dict_size-1).length() > key_len) {
-        throw std::runtime_error("Wrong input data: key length too short");
-    }
-
-    std::vector<std::string> keys;
-    keys.reserve(dict_size);
-    for (size_t i = 0; i < dict_size; ++i) {
-        std::string key = std::to_string(i);
-
-        if (key.length() < key_len) {
-            key.insert(0, key_len - key.length(), '0');
-        }
-        
-        keys.push_back(std::move(key));
-    }
-
-    return keys;
-}
+#include "key_generators.hpp"
 
 
 std::vector<size_t> benchmark::generate_queries(size_t query_count, size_t dict_size)
@@ -47,7 +22,7 @@ benchmark::benchmark(size_t dict_size, size_t key_len, size_t query_count)
     :   dict_size(dict_size),
         key_len(key_len),
         query_count(query_count), 
-        keys(generate_keys(dict_size, key_len)),
+        keys(generate_alnum_keys(dict_size, key_len)),
         queries(generate_queries(query_count, dict_size))
 {
     cdict = dict_create((int)dict_size + 1);
