@@ -1,0 +1,63 @@
+Benchmarking of simple dictionary implementations in C [Release build]
+Compare performance of the following variants:
+ - naive array-based dictionary in plain C with full search
+ - sorted array-based dictionary in plain C with binary search
+ - std::map from C++
+ - std::unordered_map from C++
+
+Using random alphanumeric keys
+Parameters: 
+N = size of the dictionary (number of items in the dictionary)
+L = lengt of the keys (we use keys of the equal length)
+Q = number of find queries to the dictionary (we search only existing keys)
+R = number of repeated runs (we use the median of them)
+===========================================================================
+
+Benchmark with N = 10, L = 8, Q = 100000, R = 21
+C naive dictionary time:  2033 us
+C sorted dictionary time: 2379 us (speed ratio vs above: 0.85x)
+C++ std::map time:        2664 us (speed ratio vs above: 0.89x)
+C++ unordererd map time:  771 us (speed ratio vs above: 3.46x)
+===========================================================================
+Benchmark with N = 20, L = 8, Q = 100000, R = 21
+C naive dictionary time:  2878 us
+C sorted dictionary time: 2564 us (speed ratio vs above: 1.12x)
+C++ std::map time:        3334 us (speed ratio vs above: 0.77x)
+C++ unordererd map time:  1074 us (speed ratio vs above: 3.10x)
+===========================================================================
+Benchmark with N = 50, L = 8, Q = 100000, R = 21
+C naive dictionary time:  4911 us
+C sorted dictionary time: 3203 us (speed ratio vs above: 1.53x)
+C++ std::map time:        3741 us (speed ratio vs above: 0.86x)
+C++ unordererd map time:  1374 us (speed ratio vs above: 2.72x)
+===========================================================================
+Benchmark with N = 100, L = 8, Q = 100000, R = 21
+C naive dictionary time:  7877 us
+C sorted dictionary time: 3783 us (speed ratio vs above: 2.08x)
+C++ std::map time:        4623 us (speed ratio vs above: 0.82x)
+C++ unordererd map time:  673 us (speed ratio vs above: 6.87x)
+===========================================================================
+Benchmark with N = 200, L = 8, Q = 100000, R = 21
+C naive dictionary time:  14808 us
+C sorted dictionary time: 4437 us (speed ratio vs above: 3.34x)
+C++ std::map time:        6157 us (speed ratio vs above: 0.72x)
+C++ unordererd map time:  941 us (speed ratio vs above: 6.54x)
+===========================================================================
+Benchmark with N = 500, L = 8, Q = 100000, R = 21
+C naive dictionary time:  39514 us
+C sorted dictionary time: 5986 us (speed ratio vs above: 6.60x)
+C++ std::map time:        7567 us (speed ratio vs above: 0.79x)
+C++ unordererd map time:  1692 us (speed ratio vs above: 4.47x)
+===========================================================================
+Benchmark with N = 1000, L = 8, Q = 100000, R = 21
+C naive dictionary time:  77525 us
+C sorted dictionary time: 7090 us (speed ratio vs above: 10.93x)
+C++ std::map time:        8484 us (speed ratio vs above: 0.84x)
+C++ unordererd map time:  1910 us (speed ratio vs above: 4.44x)
+===========================================================================
+Benchmark with N = 10000, L = 8, Q = 100000, R = 21
+C naive dictionary time:  766481 us
+C sorted dictionary time: 12208 us (speed ratio vs above: 62.79x)
+C++ std::map time:        12506 us (speed ratio vs above: 0.98x)
+C++ unordererd map time:  1772 us (speed ratio vs above: 7.06x)
+===========================================================================
