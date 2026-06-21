@@ -173,7 +173,7 @@ struct dict_entry* dict_put(struct dict* dict, const char* key, int value)
         sizeof(struct dict_entry), 
         dict_compare_entries);
 
-    return entry;
+    return dict_find(dict, key);
 }
 ```
 
