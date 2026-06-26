@@ -10,3 +10,9 @@ Several third-party implementations based on hash tables are available (for exam
 
 This led to the following question: Is it possible to implement a simple and reliable dictionary using only the standard C library while achieving performance sufficient for practical use?
 
+## Objective
+
+***What was the objective of this work?***
+
+The objective of this work was to investigate whether a simple dictionary implementation can be developed in the C programming language using only the standard library while remaining suitable for practical use and providing acceptable performance.
+
