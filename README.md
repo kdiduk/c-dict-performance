@@ -4,8 +4,8 @@ A small engineering experiment exploring whether it is possible to implement a s
 
 ## Repository contents
 
- * `src/` -- source code of dictionary implementations and benchmarks.
- * `doc/` -- technical reports
-   - `doc/report_en.md` -- English version.
-   - `doc/report_ru.md` -- Russian version.
- * `results/` -- benchmark results.
+ * [`src/`](src/) -- source code of dictionary implementations and benchmarks.
+ * [`doc/`](doc/) -- technical reports
+   - [`doc/report_en.md`](doc/report_en.md) -- English version.
+   - [`doc/report_ru.md`](doc/report_ru.md) -- Russian version.
+ * [`results/`](results/) -- benchmark results.
