@@ -14,10 +14,18 @@ The goal of this project is not to develop the fastest dictionary implementation
 
 The following dictionary implementations were evaluated:
 
-* Array of structs `(key, value)` with linear search.
-* Same array of structs as above, but sorted using `qsort()` and with binary search using `bsearch()`.
-* `std::map` from C++ (reference implementation).
-* `std::unordered_map` from C++ (reference implementation).
+ * Array of structs `(key, value)` with linear search.
+ * Same array of structs as above, but sorted using `qsort()` and with binary search using `bsearch()`.
+ * `std::map` from C++ (reference implementation).
+ * `std::unordered_map` from C++ (reference implementation).
+
+## Main observations
+
+ * Linear search becomes significantly slower as the dictionary grows:
+   - starting from 100 items it's more than **twice slower** than other implementations;
+   - starting from 1000 items it's more than **10x slower** than other implementations.
+ * A sorted array combined with `bsearch()` has the **performance surprisingly close** to `std::map` for all inputs (it's usually even more performant).
+ * The sorted-array implementation with `qsort()` and `bsearch()` is **as simple to implement as linear search** (if not even simpler).
 
 ## Repository contents
 
