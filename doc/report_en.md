@@ -267,3 +267,38 @@ All measurements were performed on a system with the following configuration:
 * Operating system: Microsoft Windows 11
 
 All benchmarks were performed using a Release build.
+
+## Results
+
+The benchmark results are presented in Tables 1 and 2.
+
+For the linear-search implementation, lookup time increases significantly as the dictionary size grows. The binary-search implementation exhibits a much slower increase in lookup time and achieves performance close to that of `std::map`. Among all evaluated implementations, `std::unordered_map` consistently provides the lowest lookup time.
+
+### Table 1. Lookup performance for randomly generated alphanumeric keys of length 8
+
+| Dictionary Size (N) | Linear Search, μs | Binary Search, μs | std::map, μs | std::unordered_map, μs |
+| ------------------: | ----------------: | ----------------: | -----------: | ---------------------: |
+|                  10 |              2033 |              2379 |         2664 |                    771 |
+|                  20 |              2878 |              2564 |         3334 |                   1074 |
+|                  50 |              4911 |              3203 |         3741 |                   1374 |
+|                 100 |              7877 |              3783 |         4623 |                    673 |
+|                 200 |             14808 |              4437 |         6157 |                    941 |
+|                 500 |             39514 |              5986 |         7567 |                   1692 |
+|                1000 |             77525 |              7090 |         8484 |                   1910 |
+|               10000 |            766481 |             12208 |        12506 |                   1772 |
+
+### Table 2. Lookup performance for randomly generated alphanumeric keys of length 12
+
+| Dictionary Size (N) | Linear Search, μs | Binary Search, μs | std::map, μs | std::unordered_map, μs |
+| ------------------: | ----------------: | ----------------: | -----------: | ---------------------: |
+|                  10 |              1931 |              2170 |         2973 |                   1195 |
+|                  20 |              3009 |              3180 |         3938 |                   1091 |
+|                  50 |              4849 |              3339 |         4686 |                   1654 |
+|                 100 |              9020 |              4096 |         5277 |                    963 |
+|                 200 |             16664 |              4621 |         5521 |                   1189 |
+|                 500 |             32407 |              5101 |         6628 |                   1753 |
+|                1000 |             64217 |              5959 |         7389 |                   1795 |
+|               10000 |            643265 |             10303 |        10821 |                   1603 |
+|               50000 |           3956211 |             19127 |        19809 |                   3108 |
+
+For keys of length 12, an additional benchmark was performed using a dictionary containing 50,000 entries.
