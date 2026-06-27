@@ -10,6 +10,8 @@ The project started with a simple question:
 
 The goal of this project is not to develop the fastest dictionary implementation, but to investigate whether a very simple implementation can be practical.
 
+The benchmark results presented here are intended to answer this specific engineering question rather than to provide a comprehensive comparison of dictionary implementations.
+
 ## Scope
 
 This study focused exclusively on the performance of **successful key lookup** operations.
@@ -30,15 +32,15 @@ The following dictionary implementations were evaluated:
 ## Main observations
 
  * Linear search becomes significantly slower as the dictionary grows:
-   - starting from 100 items it's more than **twice slower** than other implementations;
-   - starting from 1000 items it's more than **10x slower** than other implementations.
- * A sorted array combined with `bsearch()` has the **performance surprisingly close** to `std::map` for all inputs (it's usually even more performant).
+   - starting from 100 items it's more than **twice as slow** as the other implementations;
+   - starting from 1000 items it's more than **10x as slow** as the other implementations.
+ * A sorted array combined with `bsearch()` achieves **performance surprisingly close to `std::map`** for all inputs, and is often slightly faster in these benchmarks.
  * The sorted-array implementation with `qsort()` and `bsearch()` is **as simple to implement as linear search** (if not even simpler).
 
 ## Repository contents
 
  * [`src/`](src/) -- source code of dictionary implementations and benchmarks.
- * [`doc/`](doc/) -- technical reports
+ * [`doc/`](doc/) -- technical reports:
    - [`doc/report_en.md`](doc/report_en.md) -- English version.
    - [`doc/report_ru.md`](doc/report_ru.md) -- Russian version.
  * [`results/`](results/) -- benchmark results.
