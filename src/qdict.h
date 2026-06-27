@@ -22,4 +22,4 @@ void qdict_sort(struct qdict* dict);
 
 void qdict_iterate(struct qdict* dict, void (*visit)(struct qdict_entry* entry));
 
-#endif /* DICT_H */1
+#endif /* QDICT_H */

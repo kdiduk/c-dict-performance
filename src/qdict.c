@@ -16,10 +16,12 @@ struct qdict  {
 };
 
 static int qdict_compare_entries(
-    const struct qdict_entry* left, 
-    const struct qdict_entry* right)
+    const void* left,
+    const void* right)
 {
-    return strcmp(left->key, right->key);
+    const struct qdict_entry* item_left = left;
+    const struct qdict_entry* item_right = right;
+    return strcmp(item_left->key, item_right->key);
 }
 
 struct qdict* qdict_create(int reserved_size)
