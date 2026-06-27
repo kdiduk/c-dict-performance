@@ -10,6 +10,15 @@ The project started with a simple question:
 
 The goal of this project is not to develop the fastest dictionary implementation, but to investigate whether a very simple implementation can be practical.
 
+## Implementations
+
+The following dictionary implementations were evaluated:
+
+* Array of structs `(key, value)` with linear search.
+* Same array of structs as above, but sorted using `qsort()` and with binary search using `bsearch()`.
+* `std::map` from C++ (reference implementation).
+* `std::unordered_map` from C++ (reference implementation).
+
 ## Repository contents
 
  * [`src/`](src/) -- source code of dictionary implementations and benchmarks.
