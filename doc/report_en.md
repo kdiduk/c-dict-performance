@@ -236,3 +236,34 @@ Another approach is to keep the array sorted after every insertion. This can be 
 A third alternative is deferred sorting. In this approach, the dictionary is marked as requiring sorting after each insertion, and sorting is postponed until the next lookup or iteration over the dictionary.
 
 A comparison of these approaches, as well as a performance evaluation of insertion operations, is outside the scope of this work.
+
+## Methodology
+
+***How was the evaluation performed?***
+
+The performance of successful key lookup operations was evaluated.
+
+Randomly generated alphanumeric string keys of equal length were used throughout the experiments.
+
+The following parameters were used:
+
+* `N` — dictionary size (number of entries with unique keys);
+* `L` — key length (number of characters);
+* `Q` — number of lookup queries;
+* `R` — number of repetitions of the same measurement (sample size).
+
+A fixed value of `Q = 100000` was used in all experiments.
+
+For fixed key lengths of `L = 8` and `L = 12`, lookup performance was measured for the following dictionary sizes:
+
+`N = 10, 20, 50, 100, 200, 500, 1000, 10000`.
+
+Each measurement was repeated `R = 21` times, and the median value was used as the reported result.
+
+All measurements were performed on a system with the following configuration:
+
+* Processor: Intel Core i9-14900HX
+* Memory: 32 GiB
+* Operating system: Microsoft Windows 11
+
+All benchmarks were performed using a Release build.
