@@ -302,3 +302,15 @@ For the linear-search implementation, lookup time increases significantly as the
 |               50000 |           3956211 |             19127 |        19809 |                   3108 |
 
 For keys of length 12, an additional benchmark was performed using a dictionary containing 50,000 entries.
+
+## Conclusions
+
+The linear-search implementation demonstrated relatively poor performance. Lookup time was approximately two times slower than `std::map` for a dictionary containing 100 entries and nearly ten times slower for 1,000 entries.
+
+These results contradict the initial expectation that a linear-search implementation would provide acceptable performance for dictionaries containing up to approximately 1,000 entries.
+
+The binary-search implementation achieved lookup performance comparable to that of `std::map`.
+
+Furthermore, it proved to be almost as simple to implement as the linear-search version. Both implementations require approximately the same amount of code and rely only on facilities provided by the standard C library, without requiring specialized algorithms or data structures.
+
+These findings contradict the initial expectation that a binary-search-based implementation would be significantly more complex than a linear-search implementation.
