@@ -27,7 +27,7 @@ benchmark::benchmark(size_t dict_size, size_t key_len, size_t query_count)
 {
     cdict = dict_create((int)dict_size + 1);
     qdict = qdict_create((int)dict_size + 1);
-    for (int i = 0; i < dict_size; ++i) {
+    for (int i = 0; i < (int)dict_size; ++i) {
         dict_put(cdict, keys[i].c_str(), i);
         qdict_put(qdict, keys[i].c_str(), i);
         hashmap[keys[i]] = i;
