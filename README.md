@@ -10,6 +10,14 @@ The project started with a simple question:
 
 The goal of this project is not to develop the fastest dictionary implementation, but to investigate whether a very simple implementation can be practical.
 
+## Scope
+
+This study focused exclusively on the performance of **successful key lookup** operations.
+
+Insertion performance was intentionally left outside the scope of this work, as the primary objective was to investigate whether a simple dictionary implementation could provide practical lookup performance.
+
+Future work may include a comparison of different insertion strategies for sorted-array dictionaries, as well as an evaluation of their impact on overall performance.
+
 ## Implementations
 
 The following dictionary implementations were evaluated:
@@ -34,3 +42,15 @@ The following dictionary implementations were evaluated:
    - [`doc/report_en.md`](doc/report_en.md) -- English version.
    - [`doc/report_ru.md`](doc/report_ru.md) -- Russian version.
  * [`results/`](results/) -- benchmark results.
+
+## Building
+
+```bash
+mkdir build
+cmake -B build
+cmake --build build
+```
+
+## License
+
+This project is released under the MIT License.
