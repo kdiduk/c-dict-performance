@@ -1,6 +1,8 @@
 #include "hmap.h"
 
 #include <stdlib.h>
+#include <string.h>
+
 
 struct hmap {
     struct hmap_entry** table; /* A table of linked lists. */
@@ -8,6 +10,18 @@ struct hmap {
 };
 
 
+static size_t get_hash(const char* key)
+{
+    size_t hash = 0;
+
+    while (*key) {
+        hash *= 31;
+        hash += *key;
+        key++;
+    }
+
+    return hash;
+}
 
 
 struct hmap* hmap_create(size_t reserved_size)
@@ -27,6 +41,7 @@ struct hmap* hmap_create(size_t reserved_size)
 
     return hmap;
 }
+
 
 void hmap_destroy(struct hmap* hmap)
 {
@@ -48,7 +63,23 @@ void hmap_destroy(struct hmap* hmap)
     free(hmap);
 }
 
-struct hmap_entry* hmap_find(struct hmap* hmap, const char* key);
+
+struct hmap_entry* hmap_find(struct hmap* hmap, const char* key)
+{
+    if (!hmap) {
+        return NULL;
+    }
+    struct hmap_entry* entry = hmap->table[get_hash(key) % hmap->hash_size];
+    while (entry) {
+        if (strcmp(key, entry->key) == 0) {
+            break;
+        }
+
+        entry = entry->next;
+    }
+
+    return entry;
+}
 
 struct hmap_entry* hmap_put(struct hmap* hmap, const char* key, int value);
 
